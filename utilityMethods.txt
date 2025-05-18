@@ -1,0 +1,275 @@
+package com.eTask.utilities;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.ITestResult;
+
+import com.eTask.testBase.ETaskTestBase;
+
+public class UtilityMethods extends ETaskTestBase {
+
+	//Implicit wait
+	public static void impliciteWait(int sec) {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(sec));
+	}
+
+	//explicit wait
+	public static void expWaitClickable(WebElement locator, int seconds) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+		wait.until(ExpectedConditions.elementToBeClickable(locator));
+	}
+
+	//explicit wait visibility of element
+	public static void expWaitvisible(WebElement locator, int seconds) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+		wait.until(ExpectedConditions.visibilityOf(locator));
+	}
+	public static void expWaitvisible(String xpath, int seconds) {
+		WebElement locator = driver.findElement(By.xpath(xpath));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+		wait.until(ExpectedConditions.visibilityOf(locator));
+	}
+	
+	//explicit wait and click
+	public static void expWaitVisibleClick(WebElement locator, int seconds) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+		wait.until(ExpectedConditions.visibilityOf(locator));
+		locator.click();
+	}
+
+	//Drop down select by value
+	public static void select(WebElement element, String value) {
+		Select dropdown = new Select(element);
+		dropdown.selectByVisibleText(value);
+	}
+
+	//drop down - click and select
+	public static void dropSelect(WebElement element, WebElement value) {
+		element.click();
+		value.click();
+	}
+
+	//click
+	public static void doClick(WebElement element) {
+		element.click();
+	}
+	//click with string xpath
+	public static void doClick(String xpath) {
+		driver.findElement(By.xpath(xpath)).click();
+	}
+	//action click with string xpath
+	public static void moveToElementClick(String xpath) {
+		action.moveToElement(driver.findElement(By.xpath(xpath))).click().perform();
+	}
+	//javascript click with string xpath
+	public static void jsClick(String xpath) {
+		WebElement findElement = driver.findElement(By.xpath(xpath));
+		js.executeScript("arguments[0].click();", findElement);
+	}
+	//javascript click with webelement
+	public static void jsClick(WebElement element) {
+		js.executeScript("arguments[0].click();", element);
+	}
+
+	//send keys
+	public static void sendKeys(WebElement element, String text) {
+		element.sendKeys(text);
+	}
+
+	//clear the input field and enter new data
+	public static void clearAndSendKeys(WebElement element, String text) {
+		element.clear();
+		element.sendKeys(text);
+	}
+
+	//isSelected to check button is selected - radio, check box
+	public static boolean isSelected(WebElement element) {
+		boolean selected = element.isSelected();
+		return selected;
+	}
+
+	//getText - to get the text from input field
+	public static String getText(WebElement element) {
+		String text = element.getText();
+		return text;
+	}
+	
+	//get attribute value
+	public static String getAttribute(WebElement element, String attribute) {
+		String text = element.getAttribute(attribute);
+		return text;
+	}
+
+	//Enter key
+	public static void doEnter(WebElement element) {
+		element.sendKeys(Keys.ENTER);
+	}
+
+	//Space key
+	public static void doClickSpace(WebElement element) {
+		element.sendKeys(Keys.SPACE);
+	}
+	//Tab Key
+	public static void doClickTab(WebElement element) {
+		element.sendKeys(Keys.TAB);
+	}
+
+	// Scroll into the webElement
+	public static void scrollToElement(WebElement element) {
+		js.executeScript("arguments[0].scrollIntoView();", element);
+	}
+	public static void scrollToElement(String xpath) {
+		WebElement element = driver.findElement(By.xpath(xpath));
+		js.executeScript("arguments[0].scrollIntoView();", element);
+	}
+	//scroll top of the page
+	public static void scrollTop() {
+		js.executeScript("window.scrollTo(0,0);");
+	}
+	//scroll bottom of the page
+	public static void scrollBottom() {
+		js.executeScript("window.scrollBy(0, document.body.scrollHeight);");
+	}
+
+	//zoom in the page
+	public static void pageZoomIn() throws AWTException {
+
+		Robot robot = new Robot();
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_EQUALS);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+		robot.keyRelease(KeyEvent.VK_EQUALS);
+	}
+
+	//zoom out the page
+	public static void pageZoomOut() throws AWTException {
+		Robot robot = new Robot();
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_SUBTRACT);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+		robot.keyRelease(KeyEvent.VK_SUBTRACT);
+	}
+
+	//upload document
+	public static void uploadDoc(String filePath) throws AWTException {
+		StringSelection strSelection = new StringSelection(filePath);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(strSelection, null);
+
+		Robot robot = new Robot();
+
+		robot.delay(2000);
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.delay(4000);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+	}
+
+	//open new tab with URL
+	public static void newTab(String url) {
+		String childWindow = "";
+		String parentWindow = "";
+		js.executeScript("window.open()");
+		parentWindow = driver.getWindowHandle();
+		Set<String> windowHandles = driver.getWindowHandles();
+		Iterator<String> iterator = windowHandles.iterator();
+		while (iterator.hasNext()) {
+			childWindow = iterator.next();
+		}
+		if (!parentWindow.equals(childWindow)) {
+			driver.switchTo().window(childWindow);
+		}
+		driver.get(url);
+
+	}
+
+	//switch the tabs
+	public static void switchTabs() {
+		String childWindow = "";
+		String parentWindow = "";
+		parentWindow = driver.getWindowHandle();
+		Set<String> windowHandles = driver.getWindowHandles();
+		Iterator<String> iterator = windowHandles.iterator();
+		childWindow = iterator.next();
+		if (!parentWindow.equals(childWindow)) {
+			driver.switchTo().window(childWindow);
+		}
+	}
+
+	//switch to frame
+	public static void switchToFrame() {
+		int size = driver.findElements(By.tagName("iframe")).size();
+		for (int i = 0; i <= size; i++) {
+			driver.switchTo().frame(i);
+		}
+
+	}
+	//switch to frame
+	public static void switchToFrame(WebElement element) {
+		driver.switchTo().frame(element);
+
+	}
+	//get Current URL
+	public static String getCurrentURL()
+	{
+		String currentUrl = driver.getCurrentUrl();
+		return currentUrl;
+	}
+	//folder creation
+	public static String folderCreation()
+	{
+		String timeStamp = new SimpleDateFormat("dd-MMM-yy hh.mm.ss aa").format(new Date());
+		String folderName = "Regression "+timeStamp;
+		String folderPath = System.getProperty("user.dir") + "/Screenshots/"+folderName;
+		File folder = new File(folderPath);
+		folder.mkdir();
+		return folderPath+"/";
+	}
+	
+	// takesScreenshot for passed, failed test case
+	public static String takeScreenShot(ITestResult iTestResult) {
+		String dest = folderPath+ iTestResult.getName() + ".png";
+		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		try {
+			FileUtils.copyFile(scrFile, new File(dest));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return dest;
+	}
+
+	// takeScreenshot for each step
+	public static void takeScreenShot(String path) {
+		String timeStamp = new SimpleDateFormat("dd-MMM-yy hh.mm.ss aa").format(new Date());
+		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		try {
+			FileUtils.copyFile(scrFile,
+					new File(System.getProperty("user.dir") + "/Test screenshots/" + path + "/" + timeStamp + ".png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	 
+}
